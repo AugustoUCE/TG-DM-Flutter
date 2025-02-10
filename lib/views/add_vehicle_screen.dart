@@ -28,6 +28,11 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
   DateTime? selectedDate;
   String? imageUrl;
 
+   int generateId() {
+    // Implementación para generar un ID único como entero
+    return DateTime.now().millisecondsSinceEpoch;
+  }
+
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -175,6 +180,7 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
                   final plate =
                       '${letterController.text}-${numberController.text}';
                   final vehicle = Vehicle(
+                   id: generateId(),
                     plate: plate,
                     brand: brandController.text,
                     manufactureDate: selectedDate!,

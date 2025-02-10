@@ -16,7 +16,7 @@ class RegisterController {
     return digest.toString();
   }
 
-  bool registerUser(String firstName, String lastName) {
+  bool registerUser( String firstName, String lastName) {
     if (firstName.isEmpty || lastName.isEmpty) {
       return false;
     }
@@ -24,9 +24,14 @@ class RegisterController {
       return false;
     }
     final encryptedLastName = _encryptPassword(lastName);
-    _dbController.insertUser(User(firstName: firstName, lastName: encryptedLastName));
-    _loginController.users.value
-        .add(User(firstName: firstName, lastName: encryptedLastName));
+    final newUser = User(
+      id: _dbController.generateId(),
+      firstName: firstName,
+      lastName: encryptedLastName,
+       
+    );
+    _dbController.insertUser(newUser);
+    _loginController.users.value.add(newUser);
 
     return true;
   }

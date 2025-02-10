@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:persistencia/controllers/database_controller.dart';
-import 'package:xml/xml.dart';
+
 
 import '../models/User.dart';
 
@@ -20,18 +20,22 @@ class LoginController {
 
   ValueNotifier<List<User>> users = ValueNotifier<List<User>>([
     User(
+      id: 1,
         firstName: 'Emil',
         lastName:
             '651682a417b65991d6d0b7e55bf6eb1a67ea35e74295c075dada8c67e6695e4402011f3ed3dfc4e503ed7843177a9c9d34cd22722eacba94d45334d0ad7d3a9c'),
     User(
+        id: 2,
         firstName: 'Kevin',
         lastName:
             '4a8d708913dbf3745c9769f9a5c1b3a65b68a3ad390f8019a4c6298b328b6adcbdba54be92d591fad42f63cd643b99f80e5c53ceb43c58eb57ded7847ca9f9eb'),
     User(
+        id: 3,
         firstName: 'Jhon',
         lastName:
             'f04ab399ef59f5d7fe15e67d95020101c10ab976fa033cddfbecbb88ce10710e3fa5c231eef5c4440362011d6bb2bbdaf7032ba20d220684e7d22d8202d8085e'),
     User(
+        id: 4,
         firstName: 'Augusto',
         lastName:
             '89be58831b2778569e2327034092572ddfd10ef89860fb4492939920bd44e509fb35efd0b0eafa3925fae8a1bc430288f9c20546c5f3dbf5d82db2aac99d8591'),
@@ -169,73 +173,9 @@ class LoginController {
     }
   }
 
-//PARA XML
 
-  // Convertir toda la lista de user a formato XML y guardar
-  Future<void> saveXmlToFile() async {
-    try {
-      final builder = XmlBuilder();
-      builder.processing('xml', 'version="1.0"');
-      builder.element('users', nest: () {
-        for (var user in users.value) {
-          builder.xml(user.toXml());
-        }
-      });
-      final xmlString = builder.buildDocument().toString();
 
-      if (Platform.isAndroid) {
-        if (await checkPermissions()) {
-          final directory = Directory('/storage/emulated/0/Download');
-          final file = File('${directory.path}/users.xml');
-          await file.writeAsString(xmlString);
-          print('Archivo XML guardado en: ${file.path}');
-        } else {
-          print('Permiso de almacenamiento denegado.');
-        }
-      } else if (Platform.isWindows) {
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/users.xml');
-        await file.writeAsString(xmlString);
-        print('Archivo XML guardado en: ${directory.path}/users.xml');
-      } else {
-        print('Plataforma no soportada.');
-      }
-    } catch (e) {
-      print('Error al guardar el archivo XML: $e');
-    }
-  }
-
-  Future<void> loadXmlFromFile() async {
-    try {
-      if (Platform.isAndroid || Platform.isWindows) {
-        final directory = Platform.isAndroid
-            ? Directory('/storage/emulated/0/Download')
-            : await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/users.xml');
-
-        if (await file.exists()) {
-          final xmlString = await file.readAsString();
-          final document = XmlDocument.parse(xmlString);
-          final userElements = document.findAllElements('user');
-
-          users.value.clear();
-          users.value.addAll(userElements.map((element) {
-            final firstName = element.findElements('firstName').first.text;
-            final lastName = element.findElements('lastName').first.text;
-            return User(firstName: firstName, lastName: lastName);
-          }));
-
-          print('Datos cargados exitosamente desde el archivo XML.');
-        } else {
-          print('El archivo XML no existe, se usará la lista predeterminada.');
-        }
-      } else {
-        print('Plataforma no soportada para leer datos.');
-      }
-    } catch (e) {
-      print('Error al cargar los datos desde XML: $e');
-    }
-  }
+  
 
   //necesario para pedir permisooos
   Future<bool> checkPermissions() async {
@@ -247,10 +187,8 @@ class LoginController {
   }
 
   //un guardado general de los datos users
-  Future<void> saveDataOnExit() async {
-  await saveDB();
-  await saveJsonToFile();
-  await saveXmlToFile();
-  print('Datos guardados al salir.');
-}
+  Future<void> saveData() async {
+    await saveJsonToFile();
+    await saveDB();
+  } 
 }

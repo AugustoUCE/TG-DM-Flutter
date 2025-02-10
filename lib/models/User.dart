@@ -1,13 +1,14 @@
-import 'package:xml/xml.dart';
 class User {
+  final int id;
   final String firstName;
   final String lastName;
 
-  User({required this.firstName, required this.lastName});
+  User({required this.id, required this.firstName, required this.lastName});
 
-  // Método para convertir un objeto User a JSON 
+  // Método para convertir un objeto User a JSON
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'firstName': firstName,
       'lastName': lastName,
     };
@@ -17,30 +18,16 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
+      id: json['id'],
       firstName: json['firstName'],
       lastName: json['lastName'],
     );
   }
 
-
-  // Convertir un User a XML
-  String toXml() {
-    final builder = XmlBuilder();
-    builder.element('user', nest: () {
-      builder.element('firstName', nest: firstName);
-      builder.element('lastName', nest: lastName);
-    });
-    return builder.buildDocument().toString();
-  }
-
-  // Convertir el XML en User
-  factory User.fromXml(XmlElement xmlElement) {
-    final firstName = xmlElement.findElements('firstName').first.text;
-    final lastName = xmlElement.findElements('lastName').first.text;
-    return User(firstName: firstName, lastName: lastName);
-  }
+  // Método para convertir un User a un Map
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'firstName': firstName,
       'lastName': lastName,
     };

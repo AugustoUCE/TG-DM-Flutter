@@ -195,6 +195,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                   final plate =
                       '${letterController.text}-${numberController.text}';
                   final vehicle = Vehicle(
+                    id: widget.vehicle.id,
                     plate: plate,
                     brand: brandController.text,
                     manufactureDate: selectedDate!,

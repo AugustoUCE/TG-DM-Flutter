@@ -9,6 +9,10 @@ import 'package:persistencia/models/Vehicle.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseController {
+  int generateId() {
+    // Implementación para generar un ID único como entero
+    return DateTime.now().millisecondsSinceEpoch;
+  }
   static final DatabaseController _instance = DatabaseController._internal();
 
   factory DatabaseController() => _instance;
@@ -71,6 +75,7 @@ class DatabaseController {
     final db = await database;
     final encryptedLastName = _encryptLastName(user.lastName);
     final userWithEncryptedLastName = User(
+      id: user.id,
       firstName: user.firstName,
       lastName: encryptedLastName,
     );
@@ -106,6 +111,7 @@ class DatabaseController {
 
     return List.generate(maps.length, (i) {
       return User(
+        id: maps[i]['id'],
         firstName: maps[i]['firstName'],
         lastName: maps[i]['lastName'],
       );
@@ -145,6 +151,7 @@ class DatabaseController {
 
     return List.generate(maps.length, (i) {
       return Vehicle(
+        id: maps[i]['id'],
         plate: maps[i]['plate'],
         brand: maps[i]['brand'],
         manufactureDate: DateTime.parse(maps[i]['manufactureDate']),
@@ -158,18 +165,22 @@ class DatabaseController {
   Future<void> initializeDefaultUsers() async {
     final List<User> users = [
       User(
+          id: generateId(),
           firstName: 'Emil',
           lastName:
               '651682a417b65991d6d0b7e55bf6eb1a67ea35e74295c075dada8c67e6695e4402011f3ed3dfc4e503ed7843177a9c9d34cd22722eacba94d45334d0ad7d3a9c'),
       User(
+          id: generateId(),
           firstName: 'Kevin',
           lastName:
               '4a8d708913dbf3745c9769f9a5c1b3a65b68a3ad390f8019a4c6298b328b6adcbdba54be92d591fad42f63cd643b99f80e5c53ceb43c58eb57ded7847ca9f9eb'),
       User(
+          id: generateId(),
           firstName: 'Jhon',
           lastName:
               'f04ab399ef59f5d7fe15e67d95020101c10ab976fa033cddfbecbb88ce10710e3fa5c231eef5c4440362011d6bb2bbdaf7032ba20d220684e7d22d8202d8085e'),
       User(
+          id: generateId(),
           firstName: 'Augusto',
           lastName:
               '89be58831b2778569e2327034092572ddfd10ef89860fb4492939920bd44e509fb35efd0b0eafa3925fae8a1bc430288f9c20546c5f3dbf5d82db2aac99d8591'),
@@ -187,6 +198,7 @@ class DatabaseController {
       DatabaseController dbController) async {
     final vehi = [
       Vehicle(
+        id: generateId(),
         plate: 'AAA-123',
         brand: 'Toyota',
         manufactureDate: DateTime(2020, 5, 20),
@@ -195,6 +207,7 @@ class DatabaseController {
         isActive: true,
       ),
       Vehicle(
+        id: generateId(),
         plate: 'BBB-456',
         brand: 'Honda',
         manufactureDate: DateTime(2018, 11, 10),
@@ -203,6 +216,7 @@ class DatabaseController {
         isActive: false,
       ),
       Vehicle(
+        id: generateId(),
         plate: 'CCC-789',
         brand: 'Ford',
         manufactureDate: DateTime(2021, 7, 15),

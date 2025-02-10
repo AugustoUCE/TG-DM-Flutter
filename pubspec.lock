@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  aws_sdk:
+    dependency: "direct main"
+    description:
+      name: aws_sdk
+      sha256: d8dac78b7c49d61e5be2977f25cb302f13e5eef24e6aba1010d88589405be29e
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   boolean_selector:
     dependency: transitive
     description:

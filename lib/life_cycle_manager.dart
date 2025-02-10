@@ -35,7 +35,7 @@ class LifecycleManagerState extends State<LifecycleManager>
   //guardar datos
   void _saveDataOnExit() {
    
-    LoginController().saveDataOnExit();
+    LoginController().saveData();
   }
   //para envolver el widget principal
   @override

@@ -1,4 +1,5 @@
 class Vehicle {
+  int id;
   String plate;
 
   String brand;
@@ -16,6 +17,7 @@ class Vehicle {
   
 
   Vehicle({
+    required this.id,
     required this.plate,
     required this.brand,
     required this.manufactureDate,
@@ -28,6 +30,7 @@ class Vehicle {
 
   factory Vehicle.fromJson(Map<String, dynamic> json) {
     return Vehicle(
+      id: json['id'],
       plate: json['plate'],
       brand: json['brand'],
       manufactureDate: DateTime.parse(json['manufactureDate']),
@@ -40,6 +43,7 @@ class Vehicle {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'plate': plate,
       'brand': brand,
       'manufactureDate': manufactureDate.toIso8601String(),
@@ -52,6 +56,7 @@ class Vehicle {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'plate': plate,
       'brand': brand,
       'manufactureDate': manufactureDate.toIso8601String(),
