@@ -24,17 +24,25 @@ class LoginController {
 
   // Método para autenticar usando nombre y apellido
   // Future<bool>
-  bool authenticate(String firstName, String lastName) {
-    // Encriptar el apellido ingresado para comparación
-    // final encryptedInputLastName = _encryptLastName(lastName);
+  // func para autenticar usando nombre y apellido
+  Future<bool> authenticate(String firstName, String lastName) async {
+    // Obtener usuarios de la base de datos
+    final List<User> fetchedUsers = await DatabaseController().getUsers();
+    // print("Fetched Users: $fetchedUsers"); // Depuración
 
-        final encryptedLastName =
-        sha512.convert(utf8.encode(lastName)).toString();
-    // printUsers(); // Verificacion del usuario con el nombre y el apellido encriptado
-    // print(encryptedInputLastName);
+    // Encriptar el apellido ingresado
+    final encryptedLastName = sha512.convert(utf8.encode(lastName)).toString();
+    print("Encrypted LastName: $encryptedLastName"); // Depuración
 
-    return users.value.any((user) =>
-        user.firstName == firstName && user.lastName == encryptedLastName);
+    // Verificar si hay coincidencias
+    final isAuthenticated = fetchedUsers.any((user) {
+      final isFirstNameMatch = user.firstName.toLowerCase() == firstName.toLowerCase();
+      final isLastNameMatch = user.lastName == encryptedLastName;
+      return isFirstNameMatch && isLastNameMatch;
+    });
+
+    print("Authentication Result: $isAuthenticated"); // Depuración
+    return isAuthenticated;
   }
 
   // Future<bool> authenticate(String firstName, String lastName) async {

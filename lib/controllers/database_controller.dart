@@ -98,13 +98,12 @@ class DatabaseController {
   // CRUD for Users
   Future<int> insertUser(User user) async {
     final id = await generateId('user_id_seq');
-    final encryptedLastName = _encryptLastName(user.lastName);
     final result = await _connection.query(
       'INSERT INTO users (id, firstName, lastName) VALUES (@id, @firstName, @lastName) RETURNING id',
       substitutionValues: {
         'id': id,
         'firstName': user.firstName,
-        'lastName': encryptedLastName,
+        'lastName': user.lastName,
       },
     );
     return result.first[0];
@@ -116,7 +115,7 @@ class DatabaseController {
       'SELECT id FROM users WHERE firstName = @firstName AND lastName = @lastName',
       substitutionValues: {
         'firstName': user.firstName,
-        'lastName': _encryptLastName(user.lastName),
+        'lastName': user.lastName,
       },
     );
 
@@ -127,7 +126,7 @@ class DatabaseController {
 
     // Insertar el usuario si no existe
     final id = await generateId('user_id_seq');
-    final encryptedLastName = _encryptLastName(user.lastName);
+    final encryptedLastName = user.lastName;
     final insertResult = await _connection.query(
       'INSERT INTO users (id, firstName, lastName) VALUES (@id, @firstName, @lastName) RETURNING id',
       substitutionValues: {
