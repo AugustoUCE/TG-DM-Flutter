@@ -8,6 +8,10 @@ import 'package:persistencia/controllers/database_controller.dart';
 import 'package:persistencia/models/User.dart';
  // Ensure this import is correct and the file exists
 
+import 'package:cloudinary_url_gen/cloudinary.dart';
+import 'package:cloudinary_flutter/image/cld_image.dart';
+import 'package:cloudinary_flutter/cloudinary_context.dart';
+
 
 void main() async {
    WidgetsFlutterBinding.ensureInitialized();
@@ -19,15 +23,16 @@ void main() async {
   await dbController.connect();
   await dbController.createTables();
   
- 
-
- 
 
   // Solicita el permiso al iniciar la aplicación
   await LoginController().checkPermissions();
    // Carga los datos desde el archivo JSON
   await LoginController().loadJsonFromFile();
   await VehicleController().loadVehiclesFromFile();
+
+   // CloudinaryContext.cloudinary =
+   //     Cloudinary.fromCloudName(cloudName: 'rentevent');
+
   runApp(
      LifecycleManager(
       child: MyApp(),

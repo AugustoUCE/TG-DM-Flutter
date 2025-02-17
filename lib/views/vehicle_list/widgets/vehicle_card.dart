@@ -1,8 +1,4 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-
 import 'package:persistencia/controllers/vehicle_controller.dart';
 import 'package:persistencia/models/Vehicle.dart';
 
@@ -43,14 +39,14 @@ class VehicleCard extends StatelessWidget {
                   bottomLeft: Radius.circular(16),
                 ),
               ),
-              child: vehicle.imagePath != null
+              child: vehicle.imageUrl != null
                   ? ClipRRect(
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   bottomLeft: Radius.circular(16),
                 ),
-                child: Image.memory(
-                  Uint8List.fromList(vehicle.imagePath!),
+                child: Image.network(
+                  vehicle.imageUrl!,
                   fit: BoxFit.cover,
                 ),
               )
@@ -131,7 +127,7 @@ class VehicleCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                       const PopupMenuItem<String>(
+                      const PopupMenuItem<String>(
                         value: 'capture',
                         child: Row(
                           children: [
@@ -141,14 +137,9 @@ class VehicleCard extends StatelessWidget {
                           ],
                         ),
                       ),
-
                     ];
                   },
                 ),
-                /* Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 25,
-                ),*/
               ],
             ),
             const SizedBox(width: 16),

@@ -12,7 +12,7 @@ class Vehicle {
 
   bool isActive;
 
-  List<int>? imagePath;
+  String? imageUrl;
   
   
 
@@ -24,7 +24,7 @@ class Vehicle {
     required this.color,
     required this.cost,
     required this.isActive,
-    this.imagePath, 
+    this.imageUrl,
     
   });
 
@@ -37,7 +37,7 @@ class Vehicle {
       color: json['color'],
       cost: json['cost'],
       isActive: json['isActive'],
-      imagePath: json['imagePath'],
+      imageUrl: json['imageUrl'],
     );
   }
 
@@ -50,7 +50,7 @@ class Vehicle {
       'color': color,
       'cost': cost,
       'isActive': isActive,
-      'imagePath': imagePath,
+      'imageUrl': imageUrl,
     };
   }
 
@@ -63,7 +63,7 @@ class Vehicle {
       'color': color,
       'cost': cost,
       'isActive': isActive,
-      'imagePath': imagePath,
+      'imageUrl': imageUrl,
     };
   }
 }

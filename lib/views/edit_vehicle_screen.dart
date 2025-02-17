@@ -1,9 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/Vehicle.dart';
+import '../services/Cloudinary.dart'; // Asegúrate de importar tu archivo de utilidades
 
 class EditVehicleScreen extends StatefulWidget {
   final Vehicle vehicle;
@@ -28,7 +27,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
   late String selectedColor;
   late bool isActive;
   DateTime? selectedDate;
-  List<int>? imageBytes;
+  String? imageUrl;
 
   @override
   void initState() {
@@ -46,7 +45,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
     selectedColor = widget.vehicle.color;
     isActive = widget.vehicle.isActive;
     selectedDate = widget.vehicle.manufactureDate;
-    imageBytes = widget.vehicle.imagePath;
+    imageUrl = widget.vehicle.imageUrl;
   }
 
   Future<void> _showImageSourceSelection() async {
@@ -77,9 +76,10 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
     if (source != null) {
       final pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
-        final file = File(pickedFile.path);
-        imageBytes = await file.readAsBytes();
-        setState(() {});
+        final imageUrl = await uploadImageToCloudinary(pickedFile.path);
+        setState(() {
+          this.imageUrl = imageUrl; // Actualiza la URL con la nueva imagen
+        });
       }
     }
   }
@@ -114,10 +114,10 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                 onTap: _showImageSourceSelection,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: imageBytes != null
-                      ? MemoryImage(Uint8List.fromList(imageBytes!))
+                  backgroundImage: imageUrl != null
+                      ? NetworkImage(imageUrl!)
                       : AssetImage('assets/default_image.png') as ImageProvider,
-                  child: imageBytes == null
+                  child: imageUrl == null
                       ? const Icon(Icons.add_a_photo, size: 50)
                       : null,
                 ),
@@ -204,7 +204,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                     color: selectedColor,
                     cost: double.parse(costController.text),
                     isActive: isActive,
-                    imagePath: imageBytes,
+                    imageUrl: imageUrl,
                   );
                   print(vehicle.toString());
                   widget.onVehicleEdited(vehicle);

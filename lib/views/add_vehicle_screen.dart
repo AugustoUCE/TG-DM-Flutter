@@ -1,8 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:persistencia/services/Cloudinary.dart';
 import '../models/Vehicle.dart';
 import '../controllers/vehicle_controller.dart';
 
@@ -27,9 +26,10 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
   String selectedColor = 'Blanco';
   bool isActive = false;
   DateTime? selectedDate;
-  List<int>? imageBytes;
+  String? imageUrl;
 
   int generateId() {
+    // Implementación para generar un ID único como entero
     return DateTime.now().millisecondsSinceEpoch;
   }
 
@@ -78,9 +78,10 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
     if (source != null) {
       final pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
-        final file = File(pickedFile.path);
-        imageBytes = await file.readAsBytes();
-        setState(() {});
+        final imageUrl = await uploadImageToCloudinary(pickedFile.path);
+        setState(() {
+          this.imageUrl = imageUrl; // Actualiza la URL con la nueva imagen
+        });
       }
     }
   }
@@ -98,10 +99,10 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
                 onTap: _showImageSourceSelection,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: imageBytes != null
-                      ? MemoryImage(Uint8List.fromList(imageBytes!))
+                  backgroundImage: imageUrl != null
+                      ? NetworkImage(imageUrl!)
                       : AssetImage('assets/default_image.png') as ImageProvider,
-                  child: imageBytes == null
+                  child: imageUrl == null
                       ? const Icon(Icons.add_a_photo, size: 50)
                       : null,
                 ),
@@ -188,9 +189,10 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
                     color: selectedColor,
                     cost: double.parse(costController.text),
                     isActive: isActive,
-                    imagePath: imageBytes,
+                    imageUrl: imageUrl,
                   );
                   Navigator.pop(context, vehicle);
+                  // DatabaseController().insertVehicle(vehicle);
                 },
                 child: const Text('Guardar'),
               ),

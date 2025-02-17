@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:persistencia/services/Cloudinary.dart';
 
 import 'database_controller.dart';
 
@@ -19,7 +20,6 @@ class VehicleController extends ChangeNotifier {
 
   ValueNotifier<List<Vehicle>> vehicles = ValueNotifier<List<Vehicle>>([]);
 
-  
   // Hacer que loadDB() se ejecute al inicial la app
 
   void addVehicle(Vehicle vehicle) {
@@ -46,7 +46,7 @@ class VehicleController extends ChangeNotifier {
 
   void editVehicle(Vehicle updatedVehicle, int index, String oldPlate) {
     vehicles.value[index] = updatedVehicle;
-     saveVehiclesToFile();
+    saveVehiclesToFile();
     // vehicles.notifyListeners();
 
     //DB
@@ -126,7 +126,6 @@ class VehicleController extends ChangeNotifier {
         (await _databaseController.getVehicles());
     //DB
     vehicles.value = fetchedVehicles;
-
   }
 
   Future<void> saveDB() async {
@@ -155,20 +154,20 @@ class VehicleController extends ChangeNotifier {
   Future<String?> capturePhotoAndSave(Vehicle vehicle) async {
     try {
       // Captura la foto y guarda la ruta
-      final picker = ImagePicker();
-      final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+      String? savedPath = await capturePhoto();
 
-      if (photo != null) {
-        final file = File(photo.path);
-        List<int> imageBytes = await file.readAsBytes();
+      if (savedPath != null) {
+        // Asigna la ruta a vehicle.imagePath solo después de copiar exitosamente.
 
-        // Asigna los bytes a vehicle.imagePath
-        vehicle.imagePath = imageBytes;
-
-        // Guarda los cambios en la DB
-        await _databaseController.updateVehicle(vehicle, vehicle.plate);
+        // Guarda los cambios.
+        saveVehiclesToFile();
+        // Subir la imagen a Cloudinary
+        var res = uploadImageToCloudinary(savedPath);
+        vehicle.imageUrl = res as String?;
+        // Guardar en la DB
+        _databaseController.updateVehicle(vehicle, vehicle.plate);
         vehicles.notifyListeners();
-        return photo.path;
+        return savedPath;
       }
     } catch (e) {
       // Manejo de errores en caso de fallo.
@@ -194,14 +193,11 @@ class VehicleController extends ChangeNotifier {
         final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
         final savedPath = '${directory.path}/$fileName';
         final file = File(photo.path);
-        List<int> imageBytes = await file.readAsBytes(); 
-        String base64Image = base64Encode(imageBytes);
 
-        
         // Copia el archivo al nuevo destino.
         await file.copy(savedPath);
 
-        return base64Image  ;
+        return savedPath;
       } catch (e) {
         // Manejo de errores en caso de fallo.
         print('Error al guardar la foto: $e');
@@ -211,6 +207,4 @@ class VehicleController extends ChangeNotifier {
 
     return null; // Retorna null si no se capturó una foto.
   }
-
-
 }

@@ -81,7 +81,7 @@ class DatabaseController {
         color TEXT NOT NULL,
         cost REAL NOT NULL,
         isActive BOOLEAN NOT NULL,
-        imagePath BYTEA
+        imageUrl TEXT
       );
     ''');
 
@@ -181,7 +181,7 @@ class DatabaseController {
   Future<int> insertVehicle(Vehicle vehicle) async {
     final id = await generateId('vehicle_id_seq');
     final result = await _connection.query(
-      'INSERT INTO vehicles (id, plate, brand, manufactureDate, color, cost, isActive, imagePath) VALUES (@id, @plate, @brand, @manufactureDate, @color, @cost, @isActive, @imagePath) RETURNING id',
+      'INSERT INTO vehicles (id, plate, brand, manufactureDate, color, cost, isActive, imageUrl) VALUES (@id, @plate, @brand, @manufactureDate, @color, @cost, @isActive, @imageUrl) RETURNING id',
       substitutionValues: {
         'id': id,
         'plate': vehicle.plate,
@@ -190,7 +190,7 @@ class DatabaseController {
         'color': vehicle.color,
         'cost': vehicle.cost,
         'isActive': vehicle.isActive,
-        'imagePath': vehicle.imagePath,
+        'imageUrl': vehicle.imageUrl,
       },
     );
     return result.first[0];
@@ -198,7 +198,7 @@ class DatabaseController {
 
   Future<int> updateVehicle(Vehicle vehicle, String plate) async {
     final result = await _connection.query(
-      'UPDATE vehicles SET plate = @plate, brand = @brand, manufactureDate = @manufactureDate, color = @color, cost = @cost, isActive = @isActive, imagePath = @imagePath WHERE plate = @plate',
+      'UPDATE vehicles SET plate = @plate, brand = @brand, manufactureDate = @manufactureDate, color = @color, cost = @cost, isActive = @isActive, imageUrl = @imageUrl WHERE plate = @plate',
       substitutionValues: {
         'plate': plate,
         'brand': vehicle.brand,
@@ -206,7 +206,7 @@ class DatabaseController {
         'color': vehicle.color,
         'cost': vehicle.cost,
         'isActive': vehicle.isActive,
-        'imagePath': vehicle.imagePath,
+        'imageUrl': vehicle.imageUrl,
       },
     );
     return result.affectedRowCount;
@@ -231,7 +231,7 @@ class DatabaseController {
         color: row[4],
         cost: row[5],
         isActive: row[6],
-        imagePath: row[7],
+        imageUrl: row[7],
       );
     }).toList();
   }

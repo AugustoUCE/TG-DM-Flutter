@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:persistencia/controllers/database_controller.dart';
 import 'package:persistencia/models/Vehicle.dart';
 import 'package:persistencia/views/edit_vehicle_screen.dart';
-
 import 'package:persistencia/views/user_table_creen.dart';
-
 import 'package:persistencia/views/vehicle_list/widgets/vehicle_card.dart';
 import 'package:persistencia/views/vehicle_table_screen.dart';
 import '../../controllers/vehicle_controller.dart';
@@ -123,55 +121,58 @@ class VehicleListScreenState extends State<VehicleListScreen> {
             end: Alignment.bottomRight,
           ),
         ),
-        child: ValueListenableBuilder<List<Vehicle>>(
-          valueListenable: _controller.vehicles,
-          builder: (context, vehicles, _) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: vehicles.length + 1, // +1 for header
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      'Vehículos',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  );
-                }
-                final vehicle = vehicles[index - 1];
-                return VehicleCard(
-                  key: ValueKey(vehicle.plate),
-                  vehicle: vehicle,
-                  onVehicleSelected: (vehicle) {},
-                  onVehicleDeleted: (vehicle) {
-                    _controller.removeVehicle(vehicle.plate);
-                  },
-                  onVehicleEdited: (vehicle) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditVehicleScreen(
-                          vehicle: vehicle,
-                          onVehicleEdited: (editedVehicle) {
-                            _controller.editVehicle(
-                                editedVehicle,
-                                vehicles.indexWhere(
-                                        (v) => v.plate == vehicle.plate),
-                                vehicle.plate);
-                          },
+        child: RefreshIndicator(
+          onRefresh: _loadVehiclesFromDB,
+          child: ValueListenableBuilder<List<Vehicle>>(
+            valueListenable: _controller.vehicles,
+            builder: (context, vehicles, _) {
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: vehicles.length + 1, // +1 for header
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        'Vehículos',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     );
-                  },
-                );
-              },
-            );
-          },
+                  }
+                  final vehicle = vehicles[index - 1];
+                  return VehicleCard(
+                    key: ValueKey(vehicle.plate),
+                    vehicle: vehicle,
+                    onVehicleSelected: (vehicle) {},
+                    onVehicleDeleted: (vehicle) {
+                      _controller.removeVehicle(vehicle.plate);
+                    },
+                    onVehicleEdited: (vehicle) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditVehicleScreen(
+                            vehicle: vehicle,
+                            onVehicleEdited: (editedVehicle) {
+                              _controller.editVehicle(
+                                  editedVehicle,
+                                  vehicles.indexWhere(
+                                          (v) => v.plate == vehicle.plate),
+                                  vehicle.plate);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
