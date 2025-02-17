@@ -1,12 +1,15 @@
-import 'package:postgres/postgres.dart';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:persistencia/models/User.dart';
 import 'package:persistencia/models/Vehicle.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
+import 'package:postgres/postgres.dart';
 
 class DatabaseController {
   static final DatabaseController _instance = DatabaseController._internal();
+
   factory DatabaseController() => _instance;
+
   DatabaseController._internal();
 
   late PostgreSQLConnection _connection;
@@ -36,7 +39,8 @@ class DatabaseController {
   }
 
   Future<int> generateId(String sequenceName) async {
-    final result = await _connection.query('SELECT nextval(@sequenceName)', substitutionValues: {
+    final result = await _connection
+        .query('SELECT nextval(@sequenceName)', substitutionValues: {
       'sequenceName': sequenceName,
     });
     return result.first.first as int;
@@ -54,7 +58,6 @@ class DatabaseController {
     await _connection.open();
     await createTables();
     await insertUsersList(users);
-    
   }
 
   Future<void> closeConnection() async {
@@ -96,13 +99,12 @@ class DatabaseController {
   // CRUD for Users
   Future<int> insertUser(User user) async {
     final id = await generateId('user_id_seq');
-    final encryptedLastName = _encryptLastName(user.lastName);
     final result = await _connection.query(
       'INSERT INTO users (id, firstName, lastName) VALUES (@id, @firstName, @lastName) RETURNING id',
       substitutionValues: {
         'id': id,
         'firstName': user.firstName,
-        'lastName': encryptedLastName,
+        'lastName': user.lastName,
       },
     );
     return result.first[0];
@@ -114,7 +116,7 @@ class DatabaseController {
       'SELECT id FROM users WHERE firstName = @firstName AND lastName = @lastName',
       substitutionValues: {
         'firstName': user.firstName,
-        'lastName': _encryptLastName(user.lastName),
+        'lastName': user.lastName,
       },
     );
 
@@ -125,7 +127,7 @@ class DatabaseController {
 
     // Insertar el usuario si no existe
     final id = await generateId('user_id_seq');
-    final encryptedLastName = _encryptLastName(user.lastName);
+    final encryptedLastName = user.lastName;
     final insertResult = await _connection.query(
       'INSERT INTO users (id, firstName, lastName) VALUES (@id, @firstName, @lastName) RETURNING id',
       substitutionValues: {
@@ -166,13 +168,13 @@ class DatabaseController {
 
   Future<List<User>> getUsers() async {
     final result = await _connection.query('SELECT * FROM users');
-    return result.map((row) {
-      return User(
-        id: row[0],
-        firstName: row[1],
-        lastName: row[2],
-      );
-    }).toList();
+    return result
+        .map((row) => User(
+              id: row[0] as int,
+              firstName: row[1] as String,
+              lastName: row[2] as String,
+            ))
+        .toList();
   }
 
   // CRUD for Vehicles
@@ -233,7 +235,8 @@ class DatabaseController {
       );
     }).toList();
   }
-   List<User> users = [
+
+  List<User> users = [
     User(
       id: 1,
       firstName: 'Emil',
@@ -242,18 +245,20 @@ class DatabaseController {
     User(
       id: 2,
       firstName: 'Kevin',
-      lastName: '4a8d708913dbf3745c9769f9a5c1b3a65b68a3ad390f8019a4c6298b328b6adcbdba54be92d591fad42f63cd643b99f80e5c53ceb43c58eb57ded7847ca9f9eb',
+      lastName:
+          '4a8d708913dbf3745c9769f9a5c1b3a65b68a3ad390f8019a4c6298b328b6adcbdba54be92d591fad42f63cd643b99f80e5c53ceb43c58eb57ded7847ca9f9eb',
     ),
     User(
       id: 3,
       firstName: 'Jhon',
-      lastName: 'f04ab399ef59f5d7fe15e67d95020101c10ab976fa033cddfbecbb88ce10710e3fa5c231eef5c4440362011d6bb2bbdaf7032ba20d220684e7d22d8202d8085e',
+      lastName:
+          'f04ab399ef59f5d7fe15e67d95020101c10ab976fa033cddfbecbb88ce10710e3fa5c231eef5c4440362011d6bb2bbdaf7032ba20d220684e7d22d8202d8085e',
     ),
     User(
       id: 4,
       firstName: 'Augusto',
-      lastName: '89be58831b2778569e2327034092572ddfd10ef89860fb4492939920bd44e509fb35efd0b0eafa3925fae8a1bc430288f9c20546c5f3dbf5d82db2aac99d8591',
+      lastName:
+          '89be58831b2778569e2327034092572ddfd10ef89860fb4492939920bd44e509fb35efd0b0eafa3925fae8a1bc430288f9c20546c5f3dbf5d82db2aac99d8591',
     ),
   ];
 }
-
