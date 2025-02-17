@@ -12,7 +12,7 @@ class Vehicle {
 
   bool isActive;
 
-  String? imagePath;
+  List<int>? imagePath;
   
   
 

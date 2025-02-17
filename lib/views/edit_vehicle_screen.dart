@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,7 +28,8 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
   late String selectedColor;
   late bool isActive;
   DateTime? selectedDate;
-  String? imageUrl;
+  List<int>? imageBytes;
+
   @override
   void initState() {
     super.initState();
@@ -40,14 +42,14 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
         TextEditingController(text: widget.vehicle.cost.toString());
     dateController = TextEditingController(
         text:
-            '${widget.vehicle.manufactureDate.year}-${widget.vehicle.manufactureDate.month.toString().padLeft(2, '0')}-${widget.vehicle.manufactureDate.day.toString().padLeft(2, '0')}');
+        '${widget.vehicle.manufactureDate.year}-${widget.vehicle.manufactureDate.month.toString().padLeft(2, '0')}-${widget.vehicle.manufactureDate.day.toString().padLeft(2, '0')}');
     selectedColor = widget.vehicle.color;
     isActive = widget.vehicle.isActive;
     selectedDate = widget.vehicle.manufactureDate;
-    imageUrl = widget.vehicle.imagePath;
+    imageBytes = widget.vehicle.imagePath;
   }
 
-   Future<void> _showImageSourceSelection() async {
+  Future<void> _showImageSourceSelection() async {
     final picker = ImagePicker();
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
@@ -75,9 +77,9 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
     if (source != null) {
       final pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
-        setState(() {
-          imageUrl = pickedFile.path; // Actualiza la URL con la nueva imagen
-        });
+        final file = File(pickedFile.path);
+        imageBytes = await file.readAsBytes();
+        setState(() {});
       }
     }
   }
@@ -94,7 +96,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
       setState(() {
         selectedDate = pickedDate;
         dateController.text =
-            '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
+        '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
       });
     }
   }
@@ -108,14 +110,14 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-               GestureDetector(
+              GestureDetector(
                 onTap: _showImageSourceSelection,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: imageUrl != null
-                      ? FileImage(File(imageUrl!))
+                  backgroundImage: imageBytes != null
+                      ? MemoryImage(Uint8List.fromList(imageBytes!))
                       : AssetImage('assets/default_image.png') as ImageProvider,
-                  child: imageUrl == null
+                  child: imageBytes == null
                       ? const Icon(Icons.add_a_photo, size: 50)
                       : null,
                 ),
@@ -160,7 +162,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                 value: selectedColor,
                 items: ['Blanco', 'Negro', 'Azul']
                     .map((color) =>
-                        DropdownMenuItem(value: color, child: Text(color)))
+                    DropdownMenuItem(value: color, child: Text(color)))
                     .toList(),
                 onChanged: (value) {
                   setState(() {
@@ -202,7 +204,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                     color: selectedColor,
                     cost: double.parse(costController.text),
                     isActive: isActive,
-                    imagePath: imageUrl,
+                    imagePath: imageBytes,
                   );
                   print(vehicle.toString());
                   widget.onVehicleEdited(vehicle);

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ class VehicleCard extends StatelessWidget {
     required this.onVehicleDeleted,
     required this.onVehicleEdited,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -42,22 +43,22 @@ class VehicleCard extends StatelessWidget {
                   bottomLeft: Radius.circular(16),
                 ),
               ),
-              child: vehicle.imagePath != null && File(vehicle.imagePath!).existsSync()
+              child: vehicle.imagePath != null
                   ? ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        bottomLeft: Radius.circular(16),
-                      ),
-                      child: Image.file(
-                        File(vehicle.imagePath!),
-                        fit: BoxFit.cover,
-                      ),
-                    )
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
+                child: Image.memory(
+                  Uint8List.fromList(vehicle.imagePath!),
+                  fit: BoxFit.cover,
+                ),
+              )
                   : const Icon(
-                      Icons.directions_car,
-                      color: Colors.white,
-                      size: 48,
-                    ),
+                Icons.directions_car,
+                color: Colors.white,
+                size: 48,
+              ),
             ),
             const SizedBox(width: 16),
             Column(
@@ -140,7 +141,7 @@ class VehicleCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                     
+
                     ];
                   },
                 ),

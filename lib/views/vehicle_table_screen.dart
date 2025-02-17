@@ -11,49 +11,38 @@ class VehicleTableScreen extends StatefulWidget {
 }
 
 class _VehicleTableScreenState extends State<VehicleTableScreen> {
-  // Lista para almacenar los vehículos
   List<Vehicle> vehicles = [];
   final VehicleController _controller = VehicleController();
+  final DatabaseController _databaseController = DatabaseController();
 
   @override
   void initState() {
     super.initState();
-    // Cargar vehículos desde la base de datos cuando la pantalla se inicializa
     _loadVehicles();
   }
 
-  // Cargar vehículos desde la base de datos
   Future<void> _loadVehicles() async {
     List<Vehicle> loadedVehicles = await DatabaseController().getVehicles();
+    print('VEHICULOS CARGADOS');
+    loadedVehicles.forEach((element) {
+      print(element.plate);
+    });
     setState(() {
       vehicles = loadedVehicles;
     });
   }
 
-  // // Método para agregar un vehículo
   Future<void> _addVehicle() async {
-    // Vehicle newVehicle = Vehicle(
-    //   plate: 'NEW123',
-    //   brand: 'Chevrolet',
-    //   manufactureDate: DateTime(2023, 3, 15),
-    //   color: 'Green',
-    //   cost: 18000.00,
-    //   isActive: true,
-    // );
-
-    // Guardar en la base de datos
-    // await DatabaseController().insertVehicle(newVehicle);
-
     final newVehicle = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddVehicleScreen(controller: _controller),
       ),
     );
-    if (newVehicle != null) _controller.addVehicle(newVehicle);
-
-    // Actualizar la tabla después de agregar el vehículo
-    _loadVehicles();
+    if (newVehicle != null) {
+      await _databaseController.insertVehicle(newVehicle);
+      _loadVehicles();
+    }
   }
 
   Future<void> _editVehicle(Vehicle vehicle) async {
@@ -62,22 +51,17 @@ class _VehicleTableScreenState extends State<VehicleTableScreen> {
       MaterialPageRoute(
         builder: (context) => EditVehicleScreen(
           vehicle: vehicle,
-          onVehicleEdited: (editedVehicle) {
-            _controller.editVehicle(
-              editedVehicle,
-              vehicles.indexWhere((v) => v.plate == vehicle.plate),
-              vehicle.plate,
-            );
+          onVehicleEdited: (editedVehicle) async {
+            await _databaseController.updateVehicle(editedVehicle, vehicle.plate);
+            _loadVehicles();
           },
         ),
       ),
     );
-    _loadVehicles();
   }
 
-  // Método para eliminar un vehículo
-  void _deleteVehicle(String plate) {
-    _controller.removeVehicle(plate);
+  void _deleteVehicle(String plate) async {
+    await _databaseController.deleteVehicle(plate);
     _loadVehicles();
   }
 
@@ -114,11 +98,9 @@ class _VehicleTableScreenState extends State<VehicleTableScreen> {
                         cells: [
                           DataCell(Text(vehicle.plate)),
                           DataCell(Text(vehicle.brand)),
-                          DataCell(Text('${vehicle.manufactureDate.toLocal()}'
-                              .split(' ')[0])),
+                          DataCell(Text('${vehicle.manufactureDate.toLocal()}'.split(' ')[0])),
                           DataCell(Text(vehicle.color)),
-                          DataCell(
-                              Text('\$${vehicle.cost.toStringAsFixed(2)}')),
+                          DataCell(Text('\$${vehicle.cost.toStringAsFixed(2)}')),
                           DataCell(Text(vehicle.isActive ? 'Sí' : 'No')),
                           DataCell(
                             PopupMenuButton<String>(
@@ -129,8 +111,7 @@ class _VehicleTableScreenState extends State<VehicleTableScreen> {
                                   _deleteVehicle(vehicle.plate);
                                 }
                               },
-                              itemBuilder: (BuildContext context) =>
-                                  <PopupMenuEntry<String>>[
+                              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                                 const PopupMenuItem<String>(
                                   value: 'edit',
                                   child: Text('Editar'),

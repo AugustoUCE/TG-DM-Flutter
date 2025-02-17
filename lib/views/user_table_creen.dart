@@ -21,6 +21,12 @@ class UserTableScreenState extends State<UserTableScreen> {
   // Cargar vehículos desde la base de datos
   Future<void> _loadUsers() async {
     List<User> loadedUsers = await DatabaseController().getUsers();
+
+    print('USERS CARGADOS');
+    loadedUsers.forEach((element) {
+      print(element.firstName);
+    });
+
     setState(() {
       vehicles = loadedUsers;
     });

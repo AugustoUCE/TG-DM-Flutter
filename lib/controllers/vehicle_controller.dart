@@ -155,18 +155,20 @@ class VehicleController extends ChangeNotifier {
   Future<String?> capturePhotoAndSave(Vehicle vehicle) async {
     try {
       // Captura la foto y guarda la ruta
-      String? savedPath = await capturePhoto();
+      final picker = ImagePicker();
+      final XFile? photo = await picker.pickImage(source: ImageSource.camera);
 
-      if (savedPath != null) {
-        // Asigna la ruta a vehicle.imagePath solo después de copiar exitosamente.
-        vehicle.imagePath = savedPath;
+      if (photo != null) {
+        final file = File(photo.path);
+        List<int> imageBytes = await file.readAsBytes();
 
-        // Guarda los cambios.
-        saveVehiclesToFile();
-        // Guardar en la DB
-        _databaseController.updateVehicle(vehicle, vehicle.plate);
+        // Asigna los bytes a vehicle.imagePath
+        vehicle.imagePath = imageBytes;
+
+        // Guarda los cambios en la DB
+        await _databaseController.updateVehicle(vehicle, vehicle.plate);
         vehicles.notifyListeners();
-        return savedPath;
+        return photo.path;
       }
     } catch (e) {
       // Manejo de errores en caso de fallo.

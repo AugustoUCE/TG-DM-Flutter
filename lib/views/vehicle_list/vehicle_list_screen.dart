@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:persistencia/controllers/database_controller.dart';
 import 'package:persistencia/models/Vehicle.dart';
 import 'package:persistencia/views/edit_vehicle_screen.dart';
 
@@ -19,7 +20,20 @@ class VehicleListScreen extends StatefulWidget {
 
 class VehicleListScreenState extends State<VehicleListScreen> {
   final VehicleController _controller = VehicleController();
+  final DatabaseController _databaseController = DatabaseController();
 
+  @override
+  void initState() {
+    super.initState();
+    _loadVehiclesFromDB();
+  }
+
+  Future<void> _loadVehiclesFromDB() async {
+    final List<Vehicle> fetchedVehicles = await _databaseController.getVehicles();
+    setState(() {
+      _controller.vehicles.value = fetchedVehicles;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +82,7 @@ class VehicleListScreenState extends State<VehicleListScreen> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
-                  (Route<dynamic> route) => false,
+                      (Route<dynamic> route) => false,
                 );
               }
             },
@@ -87,7 +101,6 @@ class VehicleListScreenState extends State<VehicleListScreen> {
               ];
             },
           )
-
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -114,7 +127,6 @@ class VehicleListScreenState extends State<VehicleListScreen> {
           valueListenable: _controller.vehicles,
           builder: (context, vehicles, _) {
             return ListView.builder(
-              // controller: _scrollController,
               padding: const EdgeInsets.all(16),
               itemCount: vehicles.length + 1, // +1 for header
               itemBuilder: (context, index) {
@@ -135,9 +147,7 @@ class VehicleListScreenState extends State<VehicleListScreen> {
                 return VehicleCard(
                   key: ValueKey(vehicle.plate),
                   vehicle: vehicle,
-                  onVehicleSelected: (vehicle) {
-                    
-                  },
+                  onVehicleSelected: (vehicle) {},
                   onVehicleDeleted: (vehicle) {
                     _controller.removeVehicle(vehicle.plate);
                   },
@@ -151,7 +161,7 @@ class VehicleListScreenState extends State<VehicleListScreen> {
                             _controller.editVehicle(
                                 editedVehicle,
                                 vehicles.indexWhere(
-                                    (v) => v.plate == vehicle.plate),
+                                        (v) => v.plate == vehicle.plate),
                                 vehicle.plate);
                           },
                         ),

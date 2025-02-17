@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,10 +27,9 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
   String selectedColor = 'Blanco';
   bool isActive = false;
   DateTime? selectedDate;
-  String? imageUrl;
+  List<int>? imageBytes;
 
-   int generateId() {
-    // Implementación para generar un ID único como entero
+  int generateId() {
     return DateTime.now().millisecondsSinceEpoch;
   }
 
@@ -45,11 +45,12 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
       setState(() {
         selectedDate = pickedDate;
         dateController.text =
-            '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
+        '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
       });
     }
   }
-    Future<void> _showImageSourceSelection() async {
+
+  Future<void> _showImageSourceSelection() async {
     final picker = ImagePicker();
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
@@ -77,9 +78,9 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
     if (source != null) {
       final pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
-        setState(() {
-          imageUrl = pickedFile.path; // Actualiza la URL con la nueva imagen
-        });
+        final file = File(pickedFile.path);
+        imageBytes = await file.readAsBytes();
+        setState(() {});
       }
     }
   }
@@ -93,14 +94,14 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-           GestureDetector(
+              GestureDetector(
                 onTap: _showImageSourceSelection,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: imageUrl != null
-                      ? FileImage(File(imageUrl!))
+                  backgroundImage: imageBytes != null
+                      ? MemoryImage(Uint8List.fromList(imageBytes!))
                       : AssetImage('assets/default_image.png') as ImageProvider,
-                  child: imageUrl == null
+                  child: imageBytes == null
                       ? const Icon(Icons.add_a_photo, size: 50)
                       : null,
                 ),
@@ -145,7 +146,7 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
                 value: selectedColor,
                 items: ['Blanco', 'Negro', 'Azul']
                     .map((color) =>
-                        DropdownMenuItem(value: color, child: Text(color)))
+                    DropdownMenuItem(value: color, child: Text(color)))
                     .toList(),
                 onChanged: (value) {
                   setState(() {
@@ -180,17 +181,16 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
                   final plate =
                       '${letterController.text}-${numberController.text}';
                   final vehicle = Vehicle(
-                   id: generateId(),
+                    id: generateId(),
                     plate: plate,
                     brand: brandController.text,
                     manufactureDate: selectedDate!,
                     color: selectedColor,
                     cost: double.parse(costController.text),
                     isActive: isActive,
-                    imagePath: imageUrl,
+                    imagePath: imageBytes,
                   );
                   Navigator.pop(context, vehicle);
-                  // DatabaseController().insertVehicle(vehicle);
                 },
                 child: const Text('Guardar'),
               ),
