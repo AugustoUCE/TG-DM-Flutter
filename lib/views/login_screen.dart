@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:persistencia/controllers/database_controller.dart';
+import 'package:persistencia/models/User.dart';
 import '../controllers/login_controller.dart';
 import 'vehicle_list/vehicle_list_screen.dart';
 import 'register_screen.dart';
@@ -23,8 +24,11 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     final dbController = DatabaseController();
     WidgetsFlutterBinding.ensureInitialized();
-    
+    LoginController().printUsers();
+    // DatabaseController().getAllUsers();
+    LoginController().loadDB();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -176,8 +180,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           horizontal: 50,
                         ),
                       ),
-                      onPressed: () {
-                        if (_controller.authenticate(
+                      onPressed: () async {
+                        if (await _controller.authenticate(
                           firstNameController.text,
                           lastNameController.text,
                         )) {

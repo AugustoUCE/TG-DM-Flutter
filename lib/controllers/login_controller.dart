@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:persistencia/controllers/database_controller.dart';
 
-
 import '../models/User.dart';
 
 class LoginController {
@@ -18,49 +17,41 @@ class LoginController {
 
   factory LoginController() => _mismaInstancia;
 
-  ValueNotifier<List<User>> users = ValueNotifier<List<User>>([
-   
-  ]);
+  ValueNotifier<List<User>> users = ValueNotifier<List<User>>([]);
 
-  // Método para autenticar usando nombre y apellido
-  // Future<bool>
-  bool authenticate(String firstName, String lastName) {
-    // Encriptar el apellido ingresado para comparación
-    // final encryptedInputLastName = _encryptLastName(lastName);
+  // func para autenticar usando nombre y apellido
+  Future<bool> authenticate(String firstName, String lastName) async {
+    // Obtener usuarios de la base de datos
+    final List<User> fetchedUsers = await DatabaseController().getUsers();
+    // print("Fetched Users: $fetchedUsers"); // Depuración
 
-        final encryptedLastName =
-        sha512.convert(utf8.encode(lastName)).toString();
-    // printUsers(); // Verificacion del usuario con el nombre y el apellido encriptado
-    // print(encryptedInputLastName);
+    // Encriptar el apellido ingresado
+    final encryptedLastName = sha512.convert(utf8.encode(lastName)).toString();
+    print("Encrypted LastName: $encryptedLastName"); // Depuración
 
-    return users.value.any((user) =>
-        user.firstName == firstName && user.lastName == encryptedLastName);
+    // Verificar si hay coincidencias
+    final isAuthenticated = fetchedUsers.any((user) {
+      final isFirstNameMatch = user.firstName.toLowerCase() == firstName.toLowerCase();
+      final isLastNameMatch = user.lastName == encryptedLastName;
+      return isFirstNameMatch && isLastNameMatch;
+    });
+
+    print("Authentication Result: $isAuthenticated"); // Depuración
+    return isAuthenticated;
   }
-
   // Future<bool> authenticate(String firstName, String lastName) async {
-  //   try {
-  //     // Encriptar el apellido ingresado
-  //     final encryptedLastName =
-  //     sha512.convert(utf8.encode(lastName)).toString();
+  //   // Encriptar el apellido ingresado para comparación
+  //   // final encryptedInputLastName = _encryptLastName(lastName);
+  //   final List<User> fetchedUsers = await DatabaseController().getUsers();
+  //   final encryptedLastName = sha512.convert(utf8.encode(lastName)).toString();
+  //   // printUsers(); // Verificacion del usuario con el nombre y el apellido encriptado
+  //   // print(encryptedInputLastName);
+  //   _mismaInstancia.users.value.forEach((u)=>print(u.firstName));
   //
-  //     // Obtener todos los usuarios
-  //     List<User> users = await _databaseController.getUsers();
-  //
-  //     // Verificar las credenciales
-  //     for (User user in users) {
-  //       print('Comparando con usuario: ${user.toJson()}');
-  //       if (user.firstName == firstName && user.lastName == encryptedLastName) {
-  //         print('Inicio de sesión exitoso');
-  //         return true;
-  //       }
-  //     }
-  //     print('Credenciales incorrectas');
-  //     return false;
-  //   } catch (e) {
-  //     print('Error al iniciar sesión: $e');
-  //     return false;
-  //   }
+  //   return fetchedUsers.any((user) =>
+  //       user.firstName == firstName && user.lastName == encryptedLastName);
   // }
+/////////////////////////////////////////////////////////////////
 
 
   //ver si se modifica la lista
@@ -111,9 +102,22 @@ class LoginController {
     //   users.value.add(fusr);
     // }
 
-    final List<User> fetchedUsers = (await _databaseController.getUsers());
+    final List<User> fetchedUsers = await DatabaseController().getUsers();
+
+// Convertir users.value a un Set temporal para evitar duplicados
+    final Set<User> uniqueUsers = users.value.toSet();
+
+// Agregar usuarios de fetchedUsers al Set
+    uniqueUsers.addAll(fetchedUsers);
+
+// Actualizar users.value con los usuarios únicos
+    LoginController().users.value.clear();
+    LoginController().users.value.addAll(uniqueUsers) ;
     //DB
-    users.value = fetchedUsers;
+    print(LoginController().users.value);
+    fetchedUsers.forEach((user) => print(user.firstName + user.lastName));
+
+    // LoginController().printUsers();
 
     // users = fetchedUsers;
   }
@@ -154,10 +158,6 @@ class LoginController {
     }
   }
 
-
-
-  
-
   //necesario para pedir permisooos
   Future<bool> checkPermissions() async {
     final status = await Permission.storage.status;
@@ -171,5 +171,5 @@ class LoginController {
   Future<void> saveData() async {
     await saveJsonToFile();
     await saveDB();
-  } 
+  }
 }

@@ -10,11 +10,6 @@ class RegisterController {
   final LoginController _loginController = LoginController();
   final DatabaseController _dbController = DatabaseController();
  
-  String _encryptPassword(String lastName) {
-    final bytes = utf8.encode(lastName);
-    final digest = sha512.convert(bytes);
-    return digest.toString();
-  }
 
   Future<bool> registerUser( String firstName, String lastName) async {
     if ( firstName.isEmpty || lastName.isEmpty) {
@@ -23,7 +18,7 @@ class RegisterController {
     if (_loginController.users.value.any((user) => user.firstName == firstName)) {
       return false;
     }
-    final encryptedLastName = _encryptPassword(lastName);
+    final encryptedLastName = sha512.convert(utf8.encode(lastName)).toString();
     final newUserId = await _dbController.generateId( 'user_id_seq');
     final newUser = User(
       id: newUserId,
