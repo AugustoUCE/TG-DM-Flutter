@@ -23,8 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     final dbController = DatabaseController();
     WidgetsFlutterBinding.ensureInitialized();
-    dbController.initializeDefaultUsers();
-    dbController.initializeDefaultVehicles(dbController);
+    
   }
 
   @override

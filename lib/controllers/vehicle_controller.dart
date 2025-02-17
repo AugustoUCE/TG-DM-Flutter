@@ -17,36 +17,9 @@ class VehicleController extends ChangeNotifier {
 
   factory VehicleController() => _mismaInstancia;
 
-  ValueNotifier<List<Vehicle>> vehicles = ValueNotifier<List<Vehicle>>([
-    Vehicle(
-      id: _databaseController.generateId(),
-      plate: 'AAA-123',
-      brand: 'Toyota',
-      manufactureDate: DateTime(2020, 5, 20),
-      color: 'Blanco',
-      cost: 15000,
-      isActive: true,
-    ),
-    Vehicle(
-      id: _databaseController.generateId(),
-      plate: 'BBB-456',
-      brand: 'Honda',
-      manufactureDate: DateTime(2018, 11, 10),
-      color: 'Negro',
-      cost: 12000,
-      isActive: false,
-    ),
-    Vehicle(
-      id: _databaseController.generateId(),
-      plate: 'CCC-789',
-      brand: 'Ford',
-      manufactureDate: DateTime(2021, 7, 15),
-      color: 'Azul',
-      cost: 18000,
-      isActive: true,
-    ),
-  ]);
+  ValueNotifier<List<Vehicle>> vehicles = ValueNotifier<List<Vehicle>>([]);
 
+  
   // Hacer que loadDB() se ejecute al inicial la app
 
   void addVehicle(Vehicle vehicle) {
@@ -153,9 +126,7 @@ class VehicleController extends ChangeNotifier {
         (await _databaseController.getVehicles());
     //DB
     vehicles.value = fetchedVehicles;
-    // for (Vehicle fusr in fetchedVehicles) {
-    //
-    // }
+
   }
 
   Future<void> saveDB() async {
@@ -236,42 +207,5 @@ class VehicleController extends ChangeNotifier {
     return null; // Retorna null si no se capturó una foto.
   }
 
-// Future<String?> capturePhoto() async {
-//   final picker = ImagePicker();
-//   final XFile? photo = await picker.pickImage(source: ImageSource.camera);
-//
-//   if (photo != null) {
-//     try {
-//       final directory = Directory('/storage/emulated/0/Download');
-//
-//       // Crea el directorio si no existe.
-//       if (!directory.existsSync()) {
-//         directory.createSync(recursive: true);
-//       }
-//
-//       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-//       final savedPath = '${directory.path}/$fileName';
-//       final file = File(photo.path);
-//
-//       // Copia el archivo al nuevo destino.
-//       await file.copy(savedPath);
-//
-//       // // Asigna la ruta a vehicle.imagePath solo después de copiar exitosamente.
-//       // vehicle.imagePath = savedPath;
-//       //
-//       // // Guarda los cambios.
-//       // saveVehiclesToFile();
-//       // // Guardar en la DB
-//       // _databaseController.updateVehicle(vehicle, vehicle.plate);
-//       // vehicles.notifyListeners();
-//       return savedPath;
-//     } catch (e) {
-//       // Manejo de errores en caso de fallo.
-//       print('Error al guardar la foto: $e');
-//       return null;
-//     }
-//   }
-//
-//   return null; // Retorna null si no se capturó una foto.
-// }
+
 }

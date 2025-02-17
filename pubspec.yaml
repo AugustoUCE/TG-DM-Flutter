@@ -21,6 +21,7 @@ dependencies:
   image_picker: ^1.1.2
   light_sensor: ^3.0.1
   aws_sdk: ^0.0.3
+  postgres: ^2.6.2
   
 
 

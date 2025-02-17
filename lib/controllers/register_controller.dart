@@ -16,16 +16,17 @@ class RegisterController {
     return digest.toString();
   }
 
-  bool registerUser( String firstName, String lastName) {
-    if (firstName.isEmpty || lastName.isEmpty) {
+  Future<bool> registerUser( String firstName, String lastName) async {
+    if ( firstName.isEmpty || lastName.isEmpty) {
       return false;
     }
     if (_loginController.users.value.any((user) => user.firstName == firstName)) {
       return false;
     }
     final encryptedLastName = _encryptPassword(lastName);
+    final newUserId = await _dbController.generateId( 'user_id_seq');
     final newUser = User(
-      id: _dbController.generateId(),
+      id: newUserId,
       firstName: firstName,
       lastName: encryptedLastName,
        

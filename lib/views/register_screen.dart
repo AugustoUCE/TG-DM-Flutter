@@ -68,9 +68,8 @@ class RegisterScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 50),
                     ),
-                    onPressed: () {
-                      bool isRegistered = _controller.registerUser(
-                          firstNameController.text, lastNameController.text);
+                    onPressed: () async {
+                      bool isRegistered = await _controller.registerUser(firstNameController.text, lastNameController.text);
 
                       if (isRegistered) {
                         Navigator.pop(context); // Vuelve a la pantalla anterior
