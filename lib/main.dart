@@ -5,6 +5,7 @@ import 'package:persistencia/services/life_cycle_manager.dart';
 import 'package:persistencia/services/DatabaseService.dart';
 import 'package:persistencia/views/login_screen.dart';
 import 'package:persistencia/controllers/database_controller.dart';
+import 'package:persistencia/models/User.dart';
  // Ensure this import is correct and the file exists
 
 
@@ -17,6 +18,10 @@ void main() async {
   DatabaseController dbController = DatabaseController();
   await dbController.connect();
   await dbController.createTables();
+  
+ 
+
+ 
 
   // Solicita el permiso al iniciar la aplicación
   await LoginController().checkPermissions();

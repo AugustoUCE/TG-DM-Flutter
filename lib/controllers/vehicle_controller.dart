@@ -192,11 +192,14 @@ class VehicleController extends ChangeNotifier {
         final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
         final savedPath = '${directory.path}/$fileName';
         final file = File(photo.path);
+        List<int> imageBytes = await file.readAsBytes(); 
+        String base64Image = base64Encode(imageBytes);
 
+        
         // Copia el archivo al nuevo destino.
         await file.copy(savedPath);
 
-        return savedPath;
+        return base64Image  ;
       } catch (e) {
         // Manejo de errores en caso de fallo.
         print('Error al guardar la foto: $e');
