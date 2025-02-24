@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 Future<String?> uploadImageToCloudinary(String imagePath) async {
-  final url = Uri.parse('https://api.cloudinary.com/v1_1/rentevent/upload');
+  final url = Uri.parse(dotenv.env['CLOUDINARY_URL']!);
 
   final request = http.MultipartRequest('POST', url)
-    ..fields['upload_preset'] = 'autodisp123'
+    ..fields['upload_preset'] = dotenv.env['CLOUDINARY_SPACE']!
     ..files.add(await http.MultipartFile.fromPath('file', imagePath));
 
   try {

@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:postgres/postgres.dart';
 import 'package:persistencia/models/User.dart';
 import 'package:persistencia/models/Vehicle.dart';
@@ -47,11 +48,11 @@ class DatabaseController {
 
   Future<void> connect() async {
     _connection = PostgreSQLConnection(
-      "dbautohub.camfbgvuh5re.us-east-1.rds.amazonaws.com",
-      5432,
-      "autohub",
-      username: "autohub",
-      password: "2025autohub\$17",
+      dotenv.env['AWS_URL']!,
+      int.parse(dotenv.env['URL_PORT']!),
+      "postgres",
+      username: dotenv.env['AWS_USERNAME']!,
+      password: dotenv.env['AWS_PASSWORD']!,
       useSSL: true,
     );
     await _connection.open();
