@@ -23,6 +23,7 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
   final TextEditingController brandController = TextEditingController();
   final TextEditingController costController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+  final TextEditingController mailController = TextEditingController();
   String selectedColor = 'Blanco';
   bool isActive = false;
   DateTime? selectedDate;
@@ -132,6 +133,10 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
                 controller: brandController,
                 decoration: const InputDecoration(labelText: 'Marca'),
               ),
+              TextField(
+                controller: mailController,
+                decoration: const InputDecoration(labelText: 'Mail de confirmacion '),
+              ),
               GestureDetector(
                 onTap: () => _pickDate(context),
                 child: AbsorbPointer(
@@ -187,6 +192,7 @@ class AddVehicleScreenState extends State<AddVehicleScreen> {
                     brand: brandController.text,
                     manufactureDate: selectedDate!,
                     color: selectedColor,
+                    mail: mailController.text,
                     cost: double.parse(costController.text),
                     isActive: isActive,
                     imageUrl: imageUrl,

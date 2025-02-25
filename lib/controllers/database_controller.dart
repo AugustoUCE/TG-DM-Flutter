@@ -5,6 +5,8 @@ import 'package:persistencia/models/Vehicle.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
+import '../models/Mail.dart';
+
 class DatabaseController {
   static final DatabaseController _instance = DatabaseController._internal();
 
@@ -20,6 +22,18 @@ class DatabaseController {
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_sequences WHERE schemaname = 'public' AND sequencename = 'user_id_seq') THEN
           CREATE SEQUENCE user_id_seq START 1;
+        END IF;
+      END
+      $$;
+    ''');
+  }
+
+  Future<void> createMailSequence() async {
+    await _connection.query(r'''
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_sequences WHERE schemaname = 'public' AND sequencename = 'mail_id_seq') THEN
+          CREATE SEQUENCE mail_id_seq START 1;
         END IF;
       END
       $$;
@@ -74,6 +88,16 @@ class DatabaseController {
     ''');
 
     await _connection.query('''
+      CREATE TABLE IF NOT EXISTS mails (
+        id SERIAL PRIMARY KEY,
+        para TEXT NOT NULL,
+        de TEXT NOT NULL,
+        subj TEXT NOT NULL,
+        body TEXT NOT NULL
+      );
+    ''');
+
+    await _connection.query('''
       CREATE TABLE IF NOT EXISTS vehicles (
         id SERIAL PRIMARY KEY,
         plate TEXT NOT NULL UNIQUE,
@@ -88,6 +112,7 @@ class DatabaseController {
 
     await createUserSequence();
     await createVehicleSequence();
+    await createMailSequence();
   }
 
   String _encryptLastName(String lastName) {
@@ -182,13 +207,14 @@ class DatabaseController {
   Future<int> insertVehicle(Vehicle vehicle) async {
     final id = await generateId('vehicle_id_seq');
     final result = await _connection.query(
-      'INSERT INTO vehicles (id, plate, brand, manufactureDate, color, cost, isActive, imageUrl) VALUES (@id, @plate, @brand, @manufactureDate, @color, @cost, @isActive, @imageUrl) RETURNING id',
+      'INSERT INTO vehicles (id, plate, brand, manufactureDate, color,mail, cost, isActive, imageUrl) VALUES (@id, @plate, @brand, @manufactureDate, @color,@mail, @cost, @isActive, @imageUrl) RETURNING id',
       substitutionValues: {
         'id': id,
         'plate': vehicle.plate,
         'brand': vehicle.brand,
         'manufactureDate': vehicle.manufactureDate.toIso8601String(),
         'color': vehicle.color,
+        'mail': vehicle.mail,
         'cost': vehicle.cost,
         'isActive': vehicle.isActive,
         'imageUrl': vehicle.imageUrl,
@@ -230,12 +256,30 @@ class DatabaseController {
         brand: row[2],
         manufactureDate: DateTime.parse(row[3].toString()), // Ensure correct parsing
         color: row[4],
-        cost: row[5],
-        isActive: row[6],
-        imageUrl: row[7],
+        mail: row[5],
+        cost: row[6],
+        isActive: row[7],
+        imageUrl: row[8],
       );
     }).toList();
   }
+
+  //insertar mails
+  Future<int> insertMail(Mail mail) async {
+    final id = await generateId('mail_id_seq');
+    final result = await _connection.query(
+      'INSERT INTO mails (id, para, de, subj, body) VALUES (@id, @para, @de, @subj, @body) RETURNING id',
+      substitutionValues: {
+        'id': id,
+        'para': mail.para,
+        'de': mail.de,
+        'subj': mail.subj,
+        'body': mail.body,
+      },
+    );
+    return result.first[0];
+  }
+
 
   List<User> users = [
     User(

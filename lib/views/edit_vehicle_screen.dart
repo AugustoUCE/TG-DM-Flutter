@@ -22,6 +22,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
   late TextEditingController letterController;
   late TextEditingController numberController;
   late TextEditingController brandController;
+  late TextEditingController mailController;
   late TextEditingController costController;
   late TextEditingController dateController;
   late String selectedColor;
@@ -37,6 +38,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
     numberController =
         TextEditingController(text: widget.vehicle.plate.split('-')[1]);
     brandController = TextEditingController(text: widget.vehicle.brand);
+    mailController = TextEditingController(text: widget.vehicle.mail);
     costController =
         TextEditingController(text: widget.vehicle.cost.toString());
     dateController = TextEditingController(
@@ -202,6 +204,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                     brand: brandController.text,
                     manufactureDate: selectedDate!,
                     color: selectedColor,
+                    mail: mailController.text,
                     cost: double.parse(costController.text),
                     isActive: isActive,
                     imageUrl: imageUrl,

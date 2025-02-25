@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:persistencia/models/Mail.dart';
 import 'package:persistencia/models/Vehicle.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -27,6 +28,8 @@ class VehicleController extends ChangeNotifier {
     saveVehiclesToFile();
 
     //DB
+    _databaseController.insertMail(Mail(0, vehicle.mail, 'etverkade@uce.edu.ec',
+        "confirmacion de registro", "Vehiculo registrado exitosmente"));
     _databaseController.insertVehicle(vehicle);
     vehicles.notifyListeners();
   }

@@ -8,6 +8,8 @@ class Vehicle {
 
   String color;
 
+  String mail;
+
   double cost;
 
   bool isActive;
@@ -22,6 +24,7 @@ class Vehicle {
     required this.brand,
     required this.manufactureDate,
     required this.color,
+    required this.mail,
     required this.cost,
     required this.isActive,
     this.imageUrl,
@@ -35,6 +38,7 @@ class Vehicle {
       brand: json['brand'],
       manufactureDate: DateTime.parse(json['manufactureDate']),
       color: json['color'],
+      mail: json['mail'],
       cost: json['cost'],
       isActive: json['isActive'],
       imageUrl: json['imageUrl'],
@@ -48,6 +52,7 @@ class Vehicle {
       'brand': brand,
       'manufactureDate': manufactureDate.toIso8601String(),
       'color': color,
+      'mail': mail,
       'cost': cost,
       'isActive': isActive,
       'imageUrl': imageUrl,
@@ -61,6 +66,7 @@ class Vehicle {
       'brand': brand,
       'manufactureDate': manufactureDate.toIso8601String(),
       'color': color,
+      'mail': mail,
       'cost': cost,
       'isActive': isActive,
       'imageUrl': imageUrl,
