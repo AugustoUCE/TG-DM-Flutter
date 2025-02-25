@@ -69,7 +69,8 @@ class RegisterScreen extends StatelessWidget {
                           vertical: 15, horizontal: 50),
                     ),
                     onPressed: () async {
-                      bool isRegistered = await _controller.registerUser(firstNameController.text, lastNameController.text);
+                      bool isRegistered = await _controller
+                          .registerUser(firstNameController.text, lastNameController.text);
 
                       if (isRegistered) {
                         Navigator.pop(context); // Vuelve a la pantalla anterior

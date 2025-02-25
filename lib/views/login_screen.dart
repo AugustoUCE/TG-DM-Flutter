@@ -176,8 +176,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           horizontal: 50,
                         ),
                       ),
-                      onPressed: () {
-                        if (_controller.authenticate(
+                      onPressed: () async {
+                        if (await _controller.authenticate(
                           firstNameController.text,
                           lastNameController.text,
                         )) {

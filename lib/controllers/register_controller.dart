@@ -17,12 +17,15 @@ class RegisterController {
   }
 
   Future<bool> registerUser( String firstName, String lastName) async {
+    _loginController.agregarNuevosUsuarios();
+
     if ( firstName.isEmpty || lastName.isEmpty) {
       return false;
     }
     if (_loginController.users.value.any((user) => user.firstName == firstName)) {
       return false;
     }
+    // print("register: "+lastName);
     final encryptedLastName = _encryptPassword(lastName);
     final newUserId = await _dbController.generateId( 'user_id_seq');
     final newUser = User(

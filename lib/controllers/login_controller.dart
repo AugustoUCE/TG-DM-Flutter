@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:persistencia/controllers/database_controller.dart';
 
-
 import '../models/User.dart';
 
 class LoginController {
@@ -18,50 +17,57 @@ class LoginController {
 
   factory LoginController() => _mismaInstancia;
 
-  ValueNotifier<List<User>> users = ValueNotifier<List<User>>([
-   
-  ]);
+  ValueNotifier<List<User>> users = ValueNotifier<List<User>>([]);
 
-  // Método para autenticar usando nombre y apellido
-  // Future<bool>
-  bool authenticate(String firstName, String lastName) {
-    // Encriptar el apellido ingresado para comparación
-    // final encryptedInputLastName = _encryptLastName(lastName);
+  Future<void> agregarNuevosUsuarios() async {
+    List<User> usersAWS = await _databaseController.getUsers();
+    final newUsers = usersAWS.where((user) =>
+    !users.value.any((existingUser) => existingUser.id == user.id)
+    ).toList();
+    if (newUsers.isNotEmpty) {
+      users.value.addAll(newUsers);
+      // print('---------------------NADIE NUEVO---------------------');
+    }
+  }
 
-        final encryptedLastName =
-        sha512.convert(utf8.encode(lastName)).toString();
-    // printUsers(); // Verificacion del usuario con el nombre y el apellido encriptado
-    // print(encryptedInputLastName);
+  // funcion para autenticar usando nombre y apellido
+  Future<bool> authenticate(String firstName, String lastName) async {
+    // Encriptar el apellido ingresado para comparative
+    // final encryptedInputLastName = _encryptPassword(lastName);
+
+    agregarNuevosUsuarios();
+
+    final encryptedLastName = sha512.convert(utf8.encode(lastName)).toString();
 
     return users.value.any((user) =>
-        user.firstName == firstName && user.lastName == encryptedLastName);
+    user.firstName == firstName && user.lastName == encryptedLastName);
   }
 
   // Future<bool> authenticate(String firstName, String lastName) async {
-  //   try {
-  //     // Encriptar el apellido ingresado
-  //     final encryptedLastName =
-  //     sha512.convert(utf8.encode(lastName)).toString();
+  //   // Encriptar el apellido ingresado
+  //   final encryptedLastName = sha512.convert(utf8.encode(lastName)).toString();
   //
-  //     // Obtener todos los usuarios
-  //     List<User> users = await _databaseController.getUsers();
-  //
-  //     // Verificar las credenciales
-  //     for (User user in users) {
-  //       print('Comparando con usuario: ${user.toJson()}');
-  //       if (user.firstName == firstName && user.lastName == encryptedLastName) {
-  //         print('Inicio de sesión exitoso');
-  //         return true;
-  //       }
-  //     }
-  //     print('Credenciales incorrectas');
-  //     return false;
-  //   } catch (e) {
-  //     print('Error al iniciar sesión: $e');
-  //     return false;
-  //   }
+  //   // Obtener todos los usuarios
+  //   List<User> users = await _databaseController.getUsers();
+  //   users.forEach((e) => print(e.firstName + '\n' + e.lastName));
+  //   // printUsers(); // Verificacion del usuario con el nombre y el apellido encriptado
+  //   print(encryptedLastName);
+  //   print(encryptedLastName);
+  //   print(encryptedLastName);
+  //   print(encryptedLastName);
+  //   // Verificar las credenciales
+  //   return users.any((user) =>
+  //       user.firstName == firstName && user.lastName == encryptedLastName);
+  //   // for (User user in users) {
+  //   //   print('Comparando con usuario: ${user.toJson()}');
+  //   //   if (user.firstName == firstName && user.lastName == encryptedLastName) {
+  //   //     print('Inicio de sesión exitoso');
+  //   //     return true;
+  //   //   }
+  //   // }
+  //   // print('Credenciales incorrectas');
+  //   // return false;
   // }
-
 
   //ver si se modifica la lista
   void printUsers() {
@@ -75,7 +81,7 @@ class LoginController {
 
   Future<void> saveJsonToFile() async {
     String jsonString =
-        jsonEncode(users.value.map((user) => user.toJson()).toList());
+    jsonEncode(users.value.map((user) => user.toJson()).toList());
     if (Platform.isAndroid) {
       if (await checkPermissions()) {
         try {
@@ -154,15 +160,13 @@ class LoginController {
     }
   }
 
-
-
-  
-
   //necesario para pedir permisooos
   Future<bool> checkPermissions() async {
     final status = await Permission.storage.status;
     if (status.isDenied || status.isPermanentlyDenied) {
-      return await Permission.manageExternalStorage.request().isGranted;
+      return await Permission.manageExternalStorage
+          .request()
+          .isGranted;
     }
     return status.isGranted;
   }
@@ -171,5 +175,5 @@ class LoginController {
   Future<void> saveData() async {
     await saveJsonToFile();
     await saveDB();
-  } 
+  }
 }
