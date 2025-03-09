@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:persistencia/controllers/database_controller.dart';
+import 'package:persistencia/views/password_screen.dart';
+
 import '../controllers/login_controller.dart';
-import 'vehicle_list/vehicle_list_screen.dart';
 import 'register_screen.dart';
+import 'vehicle_list/vehicle_list_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     final dbController = DatabaseController();
     WidgetsFlutterBinding.ensureInitialized();
-    
   }
 
   @override
@@ -34,15 +35,24 @@ class _LoginScreenState extends State<LoginScreen> {
           'Iniciar Sesión',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: isDarkMode ? const Color.fromARGB(190, 2, 8, 61) : Colors.blueAccent,
+        backgroundColor: isDarkMode
+            ? const Color.fromARGB(190, 2, 8, 61)
+            : Colors.blueAccent,
         elevation: 0,
         actions: [
           IconButton(
             icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: () {
-              setState(() {
-                isDarkMode = !isDarkMode; // Alternar entre modos
-              });
+              // setState(() {
+              //   isDarkMode = !isDarkMode; // Alternar entre modos
+              // });
+
+              // Navegar a la segunda pantalla
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PasswordScreen()),
+              );
+
             },
           ),
         ],
@@ -52,7 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: BoxDecoration(
           gradient: isDarkMode
               ? const LinearGradient(
-                  colors: [Color(0xFF1E1E2C), Color(0xFF2C2C34), Color(0xFF121212)],
+                  colors: [
+                    Color(0xFF1E1E2C),
+                    Color(0xFF2C2C34),
+                    Color(0xFF121212)
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
@@ -67,7 +81,8 @@ class _LoginScreenState extends State<LoginScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              color: isDarkMode ? const Color(0xFF2C2C34) : Colors.white, // Fondo dinámico
+              color: isDarkMode ? const Color(0xFF2C2C34) : Colors.white,
+              // Fondo dinámico
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -116,9 +131,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         filled: true,
-                        fillColor: isDarkMode ? const Color(0xFF1E1E2C) : Colors.white,
+                        fillColor:
+                            isDarkMode ? const Color(0xFF1E1E2C) : Colors.white,
                       ),
-                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                      style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black),
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 12),
@@ -155,9 +172,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         filled: true,
-                        fillColor: isDarkMode ? const Color(0xFF1E1E2C) : Colors.white,
+                        fillColor:
+                            isDarkMode ? const Color(0xFF1E1E2C) : Colors.white,
                       ),
-                      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                      style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black),
                       textInputAction: TextInputAction.done,
                     ),
                     const SizedBox(height: 20),
@@ -189,7 +208,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Credenciales inválidas')),
+                            const SnackBar(
+                                content: Text('Credenciales inválidas')),
                           );
                         }
                       },

@@ -55,7 +55,6 @@ class VehicleController extends ChangeNotifier {
 
     //DB
     _databaseController.updateVehicle(updatedVehicle, oldPlate);
-    //loadDB();
     vehicles.notifyListeners();
   }
 

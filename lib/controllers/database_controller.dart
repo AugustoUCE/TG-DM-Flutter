@@ -1,11 +1,13 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:postgres/postgres.dart';
 import 'package:persistencia/models/User.dart';
 import 'package:persistencia/models/Vehicle.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
+import 'package:postgres/postgres.dart';
 
 import '../models/Mail.dart';
+import '../models/Rec.dart';
 
 class DatabaseController {
   static final DatabaseController _instance = DatabaseController._internal();
@@ -15,6 +17,91 @@ class DatabaseController {
   DatabaseController._internal();
 
   late PostgreSQLConnection _connection;
+
+  Future<void> createTables() async {
+    await _connection.query('''
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        firstName TEXT NOT NULL,
+        lastName TEXT NOT NULL
+      );
+    ''');
+
+    await _connection.query('''
+      CREATE TABLE IF NOT EXISTS mails (
+        id SERIAL PRIMARY KEY,
+        para TEXT NOT NULL,
+        de TEXT NOT NULL,
+        subj TEXT NOT NULL,
+        body TEXT NOT NULL
+      );
+    ''');
+
+    await _connection.query('''
+      CREATE TABLE IF NOT EXISTS vehicles (
+        id SERIAL PRIMARY KEY,
+        plate TEXT NOT NULL UNIQUE,
+        brand TEXT NOT NULL,
+        manufactureDate DATE NOT NULL,
+        color TEXT NOT NULL,
+        cost REAL NOT NULL,
+        isActive BOOLEAN NOT NULL,
+        imageUrl TEXT
+      );
+    ''');
+
+    //todo--------------------------------------------
+    await _connection.query('''
+      CREATE TABLE IF NOT EXISTS rec (
+        id SERIAL PRIMARY KEY,
+        firstName TEXT NOT NULL,
+        lastName TEXT NOT NULL
+      );
+    ''');
+    await createRecSequence();
+    //todo--------------------------------------------
+    await createUserSequence();
+    await createVehicleSequence();
+    await createMailSequence();
+  }
+
+//top//////////////////////////////////////////////////////////////////////////
+
+  Future<void> createRecSequence() async {
+    await _connection.query(r'''
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_sequences WHERE schemaname = 'public' AND sequencename = 'rec_id_seq') THEN
+          CREATE SEQUENCE rec_id_seq START 1;
+        END IF;
+      END
+      $$;
+    ''');
+  }
+
+  //insertar rec
+  Future<int> insertRec(Rec rec) async {
+    final id = await generateId('rec_id_seq');
+    final result = await _connection.query(
+      'INSERT INTO rec (id, firstName, lastName) VALUES (@id, @firstName, @lastName) RETURNING id',
+      substitutionValues: {
+        'id': id,
+        'firstName': rec.firstName,
+        'lastName': rec.lastName,
+      },
+    );
+    return result.first[0];
+  }
+
+  Future<Rec> getRec() async {
+    final result = await _connection.query('SELECT * FROM rec');
+
+    return result.isNotEmpty? result.map((row) {
+      return Rec(row[0], row[1], row[2]);
+    }).toList().last: Rec(0, 'ERROR', "ERROR");
+  }
+
+//bottom///////////////////////////////////////////////////////////////////////
 
   Future<void> createUserSequence() async {
     await _connection.query(r'''
@@ -76,43 +163,6 @@ class DatabaseController {
 
   Future<void> closeConnection() async {
     await _connection.close();
-  }
-
-  Future<void> createTables() async {
-    await _connection.query('''
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        firstName TEXT NOT NULL,
-        lastName TEXT NOT NULL
-      );
-    ''');
-
-    await _connection.query('''
-      CREATE TABLE IF NOT EXISTS mails (
-        id SERIAL PRIMARY KEY,
-        para TEXT NOT NULL,
-        de TEXT NOT NULL,
-        subj TEXT NOT NULL,
-        body TEXT NOT NULL
-      );
-    ''');
-
-    await _connection.query('''
-      CREATE TABLE IF NOT EXISTS vehicles (
-        id SERIAL PRIMARY KEY,
-        plate TEXT NOT NULL UNIQUE,
-        brand TEXT NOT NULL,
-        manufactureDate DATE NOT NULL,
-        color TEXT NOT NULL,
-        cost REAL NOT NULL,
-        isActive BOOLEAN NOT NULL,
-        imageUrl TEXT
-      );
-    ''');
-
-    await createUserSequence();
-    await createVehicleSequence();
-    await createMailSequence();
   }
 
   String _encryptLastName(String lastName) {
@@ -195,11 +245,7 @@ class DatabaseController {
   Future<List<User>> getUsers() async {
     final result = await _connection.query('SELECT * FROM users');
     return result.map((row) {
-      return User(
-        id: row[0],
-        firstName: row[1],
-        lastName: row[2],
-      );
+      return User(id: row[0], firstName: row[1], lastName: row[2]);
     }).toList();
   }
 
@@ -254,7 +300,8 @@ class DatabaseController {
         id: row[0],
         plate: row[1],
         brand: row[2],
-        manufactureDate: DateTime.parse(row[3].toString()), // Ensure correct parsing
+        manufactureDate: DateTime.parse(row[3].toString()),
+        // Ensure correct parsing
         color: row[4],
         mail: row[5],
         cost: row[6],
@@ -279,7 +326,6 @@ class DatabaseController {
     );
     return result.first[0];
   }
-
 
   List<User> users = [
     User(
