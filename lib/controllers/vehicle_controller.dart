@@ -30,6 +30,7 @@ class VehicleController extends ChangeNotifier {
     //DB
     _databaseController.insertMail(Mail(0, vehicle.mail, 'etverkade@uce.edu.ec',
         "confirmacion de registro", "Vehiculo registrado exitosmente"));
+    
     _databaseController.insertVehicle(vehicle);
     vehicles.notifyListeners();
   }
