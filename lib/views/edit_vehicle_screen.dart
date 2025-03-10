@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../models/Vehicle.dart';
 import '../services/Cloudinary.dart'; // Asegúrate de importar tu archivo de utilidades
 
@@ -43,7 +43,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
         TextEditingController(text: widget.vehicle.cost.toString());
     dateController = TextEditingController(
         text:
-        '${widget.vehicle.manufactureDate.year}-${widget.vehicle.manufactureDate.month.toString().padLeft(2, '0')}-${widget.vehicle.manufactureDate.day.toString().padLeft(2, '0')}');
+            '${widget.vehicle.manufactureDate.year}-${widget.vehicle.manufactureDate.month.toString().padLeft(2, '0')}-${widget.vehicle.manufactureDate.day.toString().padLeft(2, '0')}');
     selectedColor = widget.vehicle.color;
     isActive = widget.vehicle.isActive;
     selectedDate = widget.vehicle.manufactureDate;
@@ -98,7 +98,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
       setState(() {
         selectedDate = pickedDate;
         dateController.text =
-        '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
+            '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
       });
     }
   }
@@ -112,6 +112,16 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              if (!isActive)
+                Container(
+                  color: Colors.amberAccent,
+                  child: Row(
+                    children: [Text('NO SE PUEDE EDITAR UN VEHICULO INACTIVO')],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                )
+              else
+                Container(),
               GestureDetector(
                 onTap: _showImageSourceSelection,
                 child: CircleAvatar(
@@ -128,6 +138,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      enabled: isActive,
                       controller: letterController,
                       maxLength: 3,
                       decoration: const InputDecoration(labelText: 'Letras'),
@@ -137,6 +148,7 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
+                      enabled: isActive,
                       controller: numberController,
                       maxLength: 4,
                       decoration: const InputDecoration(labelText: 'Números'),
@@ -146,13 +158,16 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                 ],
               ),
               TextField(
+                enabled: isActive,
                 controller: brandController,
                 decoration: const InputDecoration(labelText: 'Marca'),
               ),
               GestureDetector(
-                onTap: () => _pickDate(context),
+                behavior: HitTestBehavior.opaque,
+                onTap: isActive?() => _pickDate(context):null,
                 child: AbsorbPointer(
                   child: TextField(
+                    enabled: isActive,
                     controller: dateController,
                     decoration: const InputDecoration(
                       labelText: 'Fecha de Fabricación',
@@ -161,19 +176,23 @@ class EditVehicleScreenState extends State<EditVehicleScreen> {
                 ),
               ),
               DropdownButtonFormField(
+                autofocus: isActive,
                 value: selectedColor,
                 items: ['Blanco', 'Negro', 'Azul']
                     .map((color) =>
-                    DropdownMenuItem(value: color, child: Text(color)))
+                        DropdownMenuItem(value: color, child: Text(color)))
                     .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedColor = value as String;
-                  });
-                },
+                onChanged: isActive
+                    ? (value) {
+                        setState(() {
+                          selectedColor = value as String;
+                        });
+                      }
+                    : null,
                 decoration: const InputDecoration(labelText: 'Color'),
               ),
               TextField(
+                enabled: isActive,
                 controller: costController,
                 decoration: const InputDecoration(labelText: 'Costo'),
                 keyboardType: TextInputType.number,
