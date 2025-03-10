@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:persistencia/controllers/database_controller.dart';
 import 'package:persistencia/models/Rec.dart';
-import 'package:persistencia/views/register_screen.dart';
 
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({super.key});
@@ -12,8 +11,8 @@ class PasswordScreen extends StatefulWidget {
 
 class _PasswordScreenState extends State<PasswordScreen> {
   final DatabaseController _controller = DatabaseController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController att1Controller = TextEditingController();
+  final TextEditingController semm2Controller = TextEditingController();
   static String? text;
 
   @override
@@ -27,7 +26,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
     setState(() {
       text = texto.toString();
     });
-    super.initState();
   }
 
   @override
@@ -79,7 +77,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
                     // Campo de nombre
                     TextField(
-                      controller: firstNameController,
+                      controller: att1Controller,
                       decoration: InputDecoration(
                         labelText: 'Nombre',
                         labelStyle: TextStyle(
@@ -117,7 +115,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
                     // Campo de apellido
                     TextField(
-                      controller: lastNameController,
+                      controller: semm2Controller,
                       decoration: InputDecoration(
                         labelText: 'Apellido',
                         labelStyle: TextStyle(
@@ -167,7 +165,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       ),
                       onPressed: () async {
                         await _controller.insertRec(Rec(0,
-                            firstNameController.text, lastNameController.text));
+                            att1Controller.text, semm2Controller.text));
                         Navigator.pop(context);
                       },
                       child: Text(

@@ -54,8 +54,8 @@ class DatabaseController {
     await _connection.query('''
       CREATE TABLE IF NOT EXISTS rec (
         id SERIAL PRIMARY KEY,
-        firstName TEXT NOT NULL,
-        lastName TEXT NOT NULL
+        att1 TEXT NOT NULL,
+        semm2 TEXT NOT NULL
       );
     ''');
     await createRecSequence();
@@ -83,11 +83,11 @@ class DatabaseController {
   Future<int> insertRec(Rec rec) async {
     final id = await generateId('rec_id_seq');
     final result = await _connection.query(
-      'INSERT INTO rec (id, firstName, lastName) VALUES (@id, @firstName, @lastName) RETURNING id',
+      'INSERT INTO rec (id, att1, semm2) VALUES (@id, @att1, @semm2) RETURNING id',
       substitutionValues: {
         'id': id,
-        'firstName': rec.firstName,
-        'lastName': rec.lastName,
+        'att1': rec.att1,
+        'semm2': rec.semm2,
       },
     );
     return result.first[0];

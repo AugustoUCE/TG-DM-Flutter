@@ -1,13 +1,13 @@
 class Rec{
   final int id;
-  final String firstName;
-  final String lastName;
+  final String att1;
+  final String semm2;
 
-  Rec(this.id, this.firstName, this.lastName);
+  Rec(this.id, this.att1, this.semm2);
 
   @override
   String toString() {
-    return 'Rec{id: $id, firstName: $firstName, lastName: $lastName}';
+    return 'Rec{id: $id, att1: $att1, semm2: $semm2}';
   }
 
 }
