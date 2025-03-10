@@ -43,15 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
           IconButton(
             icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: () {
-              // setState(() {
-              //   isDarkMode = !isDarkMode; // Alternar entre modos
-              // });
-
-              // Navegar a la segunda pantalla
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PasswordScreen()),
-              );
+              setState(() {
+                isDarkMode = !isDarkMode; // Alternar entre modos
+              });
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => PasswordScreen()),
+              // );
 
             },
           ),

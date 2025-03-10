@@ -17,19 +17,39 @@ class _VehicleTableScreenState extends State<VehicleTableScreen> {
 
   @override
   void initState() {
-    super.initState();
     _loadVehicles();
+    super.initState();
   }
 
+
   Future<void> _loadVehicles() async {
-    List<Vehicle> loadedVehicles = await DatabaseController().getVehicles();
-    print('VEHICULOS CARGADOS');
-    loadedVehicles.forEach((element) {
-      print(element.plate);
-    });
-    setState(() {
-      vehicles = loadedVehicles;
-    });
+    try {
+      List<Vehicle> loadedVehicles = await DatabaseController().getVehicles();
+
+      // Validate each vehicle before adding to the list
+      List<Vehicle> validVehicles = [];
+      for (var vehicle in loadedVehicles) {
+        if (vehicle.plate != null && vehicle.brand != null && vehicle.manufactureDate != null) {
+          validVehicles.add(vehicle);
+        } else {
+          print('Invalid vehicle data skipped: ${vehicle.plate}');
+        }
+      }
+
+      print('VEHICULOS CARGADOS');
+      validVehicles.forEach((element) {
+        print(element.plate);
+      });
+
+      setState(() {
+        vehicles = validVehicles;
+      });
+    } catch (e) {
+      print('Error loading vehicles: $e');
+      setState(() {
+        vehicles = []; // Clear the list or handle the error gracefully
+      });
+    }
   }
 
   Future<void> _addVehicle() async {

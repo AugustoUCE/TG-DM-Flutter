@@ -253,14 +253,13 @@ class DatabaseController {
   Future<int> insertVehicle(Vehicle vehicle) async {
     final id = await generateId('vehicle_id_seq');
     final result = await _connection.query(
-      'INSERT INTO vehicles (id, plate, brand, manufactureDate, color,mail, cost, isActive, imageUrl) VALUES (@id, @plate, @brand, @manufactureDate, @color,@mail, @cost, @isActive, @imageUrl) RETURNING id',
+      'INSERT INTO vehicles (id, plate, brand, manufactureDate, color, cost, isActive, imageUrl) VALUES (@id, @plate, @brand, @manufactureDate, @color, @cost, @isActive, @imageUrl) RETURNING id',
       substitutionValues: {
         'id': id,
         'plate': vehicle.plate,
         'brand': vehicle.brand,
         'manufactureDate': vehicle.manufactureDate.toIso8601String(),
         'color': vehicle.color,
-        'mail': vehicle.mail,
         'cost': vehicle.cost,
         'isActive': vehicle.isActive,
         'imageUrl': vehicle.imageUrl,
@@ -303,10 +302,10 @@ class DatabaseController {
         manufactureDate: DateTime.parse(row[3].toString()),
         // Ensure correct parsing
         color: row[4],
-        mail: row[5],
-        cost: row[6],
-        isActive: row[7],
-        imageUrl: row[8],
+        mail: '',
+        cost: row[5],
+        isActive: row[6],
+        imageUrl: row[7],
       );
     }).toList();
   }
